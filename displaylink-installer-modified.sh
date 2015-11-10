@@ -361,17 +361,22 @@ usage()
 
 detect_distro()
 {
-  if which lsb_release >/dev/null; then
-    local R=$(lsb_release -d -s)
-    echo "Distribution discovered: $R"
-    if [ -z "${R##Ubuntu 14.*}" ]; then
-      SYSTEMINITDAEMON=upstart
-    elif [ -z "${R##Ubuntu 15.04*}" ]; then
-      SYSTEMINITDAEMON=systemd
+    if which lsb_release >/dev/null; then
+        local R=$(lsb_release -d -s)
+        echo "Distribution discovered: $R"
+        if [ -z "${R##Ubuntu 14.*}" ]; then
+            echo "Distribution ${R} is supported"
+            SYSTEMINITDAEMON=upstart
+        elif [ -z "${R##Linux Mint 17.*}" ]; then
+            echo "Distribution ${R} is not supported but I just want the damn installer to work"
+            SYSTEMINITDAEMON=upstart
+        elif [ -z "${R##Ubuntu 15.04*}" ]; then
+            echo "Distribution ${R} is supported"
+            SYSTEMINITDAEMON=systemd
+        fi
+    else
+        echo "WARNING: Unknown distribution, assuming defaults - this may fail." >&2
     fi
-  else
-    echo "WARNING: Unknown distribution, assuming defaults - this may fail." >&2
-  fi
 }
 
 ensure_not_running()
